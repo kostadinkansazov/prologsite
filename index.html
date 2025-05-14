@@ -1,69 +1,115 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bg">
 <head>
   <meta charset="UTF-8">
-  <title>Prolog Analyzer</title>
+  <title>Prolog Анализатор</title>
   <style>
     body {
-      font-family: Arial;
-      margin: 30px;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #eef2f3, #8e9eab);
+      margin: 0;
+      padding: 40px;
+      color: #333;
     }
-    #output {
-      white-space: pre-wrap;
-      background: #f0f0f0;
+
+    h2 {
+      text-align: center;
+      font-size: 2em;
+      color: #2c3e50;
+    }
+
+    input[type="file"] {
+      display: block;
+      margin: 20px auto;
       padding: 10px;
-      border-radius: 8px;
+      border: 2px dashed #34495e;
+      border-radius: 10px;
+      background-color: #ecf0f1;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+
+    input[type="file"]:hover {
+      background-color: #dfe6e9;
+    }
+
+    #output {
+      max-width: 900px;
+      margin: 30px auto;
+      padding: 20px;
+      background: #ffffffdd;
+      border-radius: 15px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      font-family: monospace;
+      white-space: pre-wrap;
+      line-height: 1.6;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    .section-title {
+      font-weight: bold;
+      font-size: 1.2em;
+      margin-top: 20px;
+      color: #2c3e50;
+    }
+
+    .fact { color: #27ae60; }
+    .rule { color: #2980b9; }
+    .comment { color: #7f8c8d; font-style: italic; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
 <body>
-  <h2>Качи Prolog файл (.pl)</h2>
+  <h2>🧠 Prolog Анализатор</h2>
   <input type="file" id="fileInput" accept=".pl">
   <div id="output"></div>
- 
+
   <script>
     document.getElementById('fileInput').addEventListener('change', function(event) {
       const file = event.target.files[0];
       if (!file) return;
-     
+
       const reader = new FileReader();
-     
+
       reader.onload = function(e) {
         const content = e.target.result;
         const lines = content.split('\n');
-       
+
         const facts = [];
         const rules = [];
         const comments = [];
-       
+
         lines.forEach(line => {
           const trimmed = line.trim();
-         
+          if (!trimmed) return;
+
           if (trimmed.startsWith('%')) {
-            comments.push(trimmed);
+            comments.push(`<span class="comment">${trimmed}</span>`);
           } else if (trimmed.includes(':-')) {
-            rules.push(trimmed);
-          } else if (trimmed && trimmed.endsWith('.')) {
-            facts.push(trimmed);
+            rules.push(`<span class="rule">${trimmed}</span>`);
+          } else if (trimmed.endsWith('.')) {
+            facts.push(`<span class="fact">${trimmed}</span>`);
           }
         });
-       
-        const output = `
-🔎 Анализ на Prolog файл:
--------------------------
-Факти (${facts.length}):
-${facts.join('\n')}
 
-Правила (${rules.length}):
-${rules.join('\n')}
+        const outputHTML = `
+<div class="section-title">🔹 Факти (${facts.length}):</div>
+${facts.join('<br>')}
 
-Коментари (${comments.length}):
-${comments.join('\n')}
+<div class="section-title">🔹 Правила (${rules.length}):</div>
+${rules.join('<br>')}
+
+<div class="section-title">🔹 Коментари (${comments.length}):</div>
+${comments.join('<br>')}
         `;
-       
-        document.getElementById('output').textContent = output;
+
+        document.getElementById('output').innerHTML = outputHTML;
       };
-     
+
       reader.readAsText(file);
     });
   </script>
